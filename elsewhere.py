@@ -14,12 +14,7 @@ def get_init_params():
     pass
 
 
-def predict_targets(params, prediction_data):
-    """Get predictions to compare to target."""
-    return predictions
-
-
-def get_target_data(data, ran_key):
+def get_target_data(init_data, ran_key):
     """Make the measurement on the input data.
     Return the target data, and any metadata
     that will be needed to compute the loss.
@@ -31,15 +26,29 @@ def get_target_data(data, ran_key):
     return target_data_vector, metadata, ran_key
 
 
-def get_mse_loss_data(data_target, metadata, ran_key):
+def get_prediction_data(metadata_target, ran_key):
+    """Get the metadata required to predict the target data.
+    """
+    old_key, ran_key = jax_random.split(ran_key)
+    prediction_data = metadata_target
+    return prediction_data, ran_key
+
+
+def get_mse_loss_data(data_prediction, data_target, metadata_target, ran_key):
     """
     """
+    mse_loss_data = data_prediction, data_target, metadata_target
     return mse_loss_data, ran_key
+
+
+def predict_target(params, prediction_data):
+    """Get model predictions to compare to target."""
+    return predictions
 
 
 def calculate_mse_loss(params, mse_loss_data):
     prediction_data = mse_loss_data[0]
-    predictions = predict_targets(params, prediction_data)
+    predictions = predict_target(params, prediction_data)
     targets = mse_loss_data[1]
 
     loss = 0.0

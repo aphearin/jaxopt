@@ -8,6 +8,8 @@ from jax.experimental import optimizers as jax_opt
 from elsewhere import read_init_data
 from elsewhere import get_init_params
 from elsewhere import get_target_data
+from elsewhere import get_prediction_data
+from elsewhere import predict_target
 from elsewhere import get_mse_loss_data
 from elsewhere import calculate_mse_loss
 
@@ -30,9 +32,13 @@ if __name__ == "__main__":
     data_init = read_init_data()
     params_init = get_init_params()
 
-    data_target, ran_key, metadata = get_target_data(data_init, ran_key)
+    data_target, metadata_target, ran_key = get_target_data(data_init, ran_key)
+    data_prediction, ran_key = get_prediction_data(metadata_target, ran_key)
+    prediction_init = predict_target(params_init, data_prediction)
 
-    data_mse_loss, ran_key = get_mse_loss_data(data_target, metadata, ran_key)
+    data_mse_loss, ran_key = get_mse_loss_data(
+        data_prediction, data_target, metadata_target, ran_key
+    )
 
     loss_init = calculate_mse_loss(params_init, data_mse_loss)
 
